@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chart.js Top 10 Pie Charts</title>
+  <style>
+    body {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .chart-container {
+      width: 45%;
+      max-width: 400px;
+      margin: 10px;
+      text-align: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="chart-container">
+    <canvas id="depositPieChart"></canvas>
+    <p>Deposit Value Score</p>
+  </div>
+  <div class="chart-container">
+    <canvas id="borrowPieChart"></canvas>
+    <p>Borrow Value Score</p>
+  </div>
+  <div class="chart-container">
+    <canvas id="repaymentPieChart"></canvas>
+    <p>Repayment Value Score</p>
+  </div>
+  <div class="chart-container">
+    <canvas id="lpPieChart"></canvas>
+    <p>LP Score</p>
+  </div>
+  <script>
+    // Load CSV data and perform analysis
+    Papa.parse('newLPdata.csv', {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        const data = results.data;
+
+        // Data preparation for top 10 addresses in each category
+        const addresses = data.map(row => row.Address);
+        const depositScores = data.map(row => parseFloat(row['Deposit Value Score']));
+        const borrowScores = data.map(row => parseFloat(row['Borrow Value Score']));
+        const repaymentScores = data.map(row => parseFloat(row['Repayment Value Score']));
+        const lpScores = data.map(row => parseFloat(row['LP Score']));
+
+        // Get indices of top 10 scores in each category
+        const top10DepositIndices = getTopIndices(depositScores, 10);
+        const top10BorrowIndices = getTopIndices(borrowScores, 10);
+        const top10RepaymentIndices = getTopIndices(repaymentScores, 10);
+        const top10LpIndices = getTopIndices(lpScores, 10);
+
+        // Create pie charts for top 10 addresses
+        createPieChart('depositPieChart', addresses, depositScores, top10DepositIndices);
+        createPieChart('borrowPieChart', addresses, borrowScores, top10BorrowIndices);
+        createPieChart('repaymentPieChart', addresses, repaymentScores, top10RepaymentIndices);
+        createPieChart('lpPieChart', addresses, lpScores, top10LpIndices);
+      }
+    });
+
+    // Helper function to get the indices of top N values in an array
+    function getTopIndices(array, n) {
+      return [...array.keys()].sort((a, b) => array[b] - array[a]).slice(0, n);
+    }
+
+    // Helper function to create a pie chart
+    function createPieChart(canvasId, labels, data, indices) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: getLabels(labels, indices),
+          datasets: [{
+            data: getData(data, indices),
+            backgroundColor: getRandomColors(indices.length)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    // Helper function to get labels based on indices
+    function getLabels(array, indices) {
+      return indices.map(index => array[index]);
+    }
+
+    // Helper function to get data based on indices
+    function getData(array, indices) {
+      return indices.map(index => array[index]);
+    }
+
+    // Helper function to generate random colors
+    function getRandomColors(count) {
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        colors.push(`rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.6)`);
+      }
+      return colors;
+    }
+  </script>
+</body>
+</html>

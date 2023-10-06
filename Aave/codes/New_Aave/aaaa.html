@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChartJS Histogram Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+  <div>
+    <canvas id="depositTimeChart"></canvas>
+  </div>
+  <div>
+    <canvas id="depositValueChart"></canvas>
+  </div>
+  <div>
+    <canvas id="borrowTimeChart"></canvas>
+  </div>
+  <div>
+    <canvas id="repaymentValueChart"></canvas>
+  </div>
+  <div id="errorDisplay"></div>
+
+  <script>
+    function renderHistograms(data) {
+      if (!data || data.length === 0) {
+        const errorDisplay = document.getElementById("errorDisplay");
+        errorDisplay.innerText = 'No data to display. Please make sure the CSV file contains valid data.';
+        return;
+      }
+
+      const depositTimeScores = data.map(row => parseInt(row['Deposit Time Score']));
+      const depositValueScores = data.map(row => parseInt(row['Deposit Value Score']));
+      const borrowTimeScores = data.map(row => parseInt(row['Borrow Time Score']));
+      const repaymentValueScores = data.map(row => parseInt(row['Repayment Value Score']));
+
+      function calculateHistogramFrequencies(data) {
+        const histogramData = {};
+
+        data.forEach(score => {
+          histogramData[score] = histogramData[score] ? histogramData[score] + 1 : 1;
+        });
+
+        return Object.entries(histogramData).map(([bin, frequency]) => ({ x: bin, y: frequency }));
+      }
+
+      new Chart(document.getElementById("depositTimeChart"), {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'Deposit Time Score',
+            data: calculateHistogramFrequencies(depositTimeScores),
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'linear',
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Deposit Time Score'
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("depositValueChart"), {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'Deposit Value Score',
+            data: calculateHistogramFrequencies(depositValueScores),
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'linear',
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Deposit Value Score'
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("borrowTimeChart"), {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'Borrow Time Score',
+            data: calculateHistogramFrequencies(borrowTimeScores),
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'linear',
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Borrow Time Score'
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("repaymentValueChart"), {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'Repayment Value Score',
+            data: calculateHistogramFrequencies(repaymentValueScores),
+            backgroundColor: 'rgba(153, 102, 255, 0.5)',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'linear',
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Repayment Value Score'
+            }
+          }
+        }
+      });
+    }
+
+    function loadCSV() {
+      Papa.parse('./newLPdata.csv', {
+        header: true,
+        download: true,
+        complete: function(results) {
+          renderHistograms(results.data);
+        },
+        error: function(err) {
+          const errorDisplay = document.getElementById("errorDisplay");
+          errorDisplay.innerText = 'Error loading CSV file. Please check the file path and try again.';
+        }
+      });
+    }
+    document.addEventListener('DOMContentLoaded', loadCSV);
+  </script>
+</body>
+</html>
+
+

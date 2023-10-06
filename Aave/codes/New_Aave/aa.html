@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChartJS Histograms Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div>
+    <canvas id="depositValueHistogram"></canvas>
+  </div>
+  <div>
+    <canvas id="depositTimeHistogram"></canvas>
+  </div>
+  <div>
+    <canvas id="borrowTimeHistogram"></canvas>
+  </div>
+  <div>
+    <canvas id="repaymentValueHistogram"></canvas>
+  </div>
+
+  <script>
+    // Sample data (replace this with your actual data)
+    const lp_score_df = [
+      { 'Deposit Value Score': 3, 'Deposit Time Score': 10, 'Borrow Time Score': 5, 'Repayment Value Score': 2 },
+      { 'Deposit Value Score': 2, 'Deposit Time Score': 15, 'Borrow Time Score': 5, 'Repayment Value Score': 1 },
+      // Add more data rows here
+    ];
+
+    // Function to calculate the frequency of each score
+    function calculateFrequency(data, column) {
+      const scores = data.map(row => row[column]);
+      const frequencyMap = {};
+      scores.forEach(score => {
+        frequencyMap[score] = (frequencyMap[score] || 0) + 1;
+      });
+      return Object.entries(frequencyMap).sort((a, b) => a[0] - b[0]);
+    }
+
+    // Get the data and labels for each histogram
+    const depositValueFrequencyData = calculateFrequency(lp_score_df, 'Deposit Value Score');
+    const depositTimeFrequencyData = calculateFrequency(lp_score_df, 'Deposit Time Score');
+    const borrowTimeFrequencyData = calculateFrequency(lp_score_df, 'Borrow Time Score');
+    const repaymentValueFrequencyData = calculateFrequency(lp_score_df, 'Repayment Value Score');
+
+    const depositValueLabels = depositValueFrequencyData.map(entry => entry[0]);
+    const depositValueData = depositValueFrequencyData.map(entry => entry[1]);
+
+    const depositTimeLabels = depositTimeFrequencyData.map(entry => entry[0]);
+    const depositTimeData = depositTimeFrequencyData.map(entry => entry[1]);
+
+    const borrowTimeLabels = borrowTimeFrequencyData.map(entry => entry[0]);
+    const borrowTimeData = borrowTimeFrequencyData.map(entry => entry[1]);
+
+    const repaymentValueLabels = repaymentValueFrequencyData.map(entry => entry[0]);
+    const repaymentValueData = repaymentValueFrequencyData.map(entry => entry[1]);
+
+    // Create the ChartJS histograms
+    new Chart(document.getElementById("depositValueHistogram"), {
+      type: 'bar',
+      data: {
+        labels: depositValueLabels,
+        datasets: [{
+          label: 'Frequency',
+          data: depositValueData,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1, // Ensures y-axis values are integers
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribution of Deposit Value Score'
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("depositTimeHistogram"), {
+      type: 'bar',
+      data: {
+        labels: depositTimeLabels,
+        datasets: [{
+          label: 'Frequency',
+          data: depositTimeData,
+          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1,
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribution of Deposit Time Score'
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("borrowTimeHistogram"), {
+      type: 'bar',
+      data: {
+        labels: borrowTimeLabels,
+        datasets: [{
+          label: 'Frequency',
+          data: borrowTimeData,
+          backgroundColor: 'rgba(75, 192, 192, 0.7)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1,
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribution of Borrow Time Score'
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("repaymentValueHistogram"), {
+      type: 'bar',
+      data: {
+        labels: repaymentValueLabels,
+        datasets: [{
+          label: 'Frequency',
+          data: repaymentValueData,
+          backgroundColor: 'rgba(153, 102, 255, 0.7)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1,
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribution of Repayment Value Score'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
